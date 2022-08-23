@@ -31,7 +31,5 @@ def initialize_build(app_name):
     utils.initialize_build.delay(f"../shonku-projects/{app_name}/Shonkufile", f"../shonku-projects/{app_name}")
     return jsonify({"app_name": app_name, "status": "OK"}), 200
 
-
-
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=6010, debug=True)
