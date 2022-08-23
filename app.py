@@ -1,6 +1,8 @@
+from crypt import methods
+from ctypes import util
 from flask import Flask, jsonify, request
 import utils
-from buildpack import Buildpack
+import subprocess
 
 app = Flask(__name__)
 
@@ -29,6 +31,13 @@ def upload_app():
 @app.route("/initialize-build/<app_name>", methods=["GET"])
 def initialize_build(app_name):
     utils.initialize_build.delay(f"../shonku-projects/{app_name}/Shonkufile", f"../shonku-projects/{app_name}")
+    return jsonify({"app_name": app_name, "status": "OK"}), 200
+
+@app.route("/build", methods=["POST"])
+def build():
+    payload = request.get_json()
+    app_name = payload.get("app_name")
+    utils.build.delay(app_name)
     return jsonify({"app_name": app_name, "status": "OK"}), 200
 
 

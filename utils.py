@@ -1,5 +1,5 @@
 from celery import Celery
-import pathlib
+import pathlib, subprocess
 import zipfile
 from buildpack import Buildpack
 
@@ -23,3 +23,8 @@ def upload_project(app_name, file):
 def initialize_build(file, save_location):
     bp = Buildpack(file)
     bp.generateDockerfile(file=file, save_location=save_location)
+
+@celery.task
+def build(app_name):
+    process = subprocess.Popen([f'app_name={app_name} ../shonku-projects/build.sh'], stdout=subprocess.PIPE, shell=True)
+    process.wait()
