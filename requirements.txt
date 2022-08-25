@@ -2,4 +2,4 @@ Flask==2.1.2
 celery==5.2.7
 redis==3.5.3
 gunicorn==20.1.0
-shonku-buildpack==0.0.2
+shonku-buildpack==0.0.4
