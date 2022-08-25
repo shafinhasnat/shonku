@@ -37,7 +37,8 @@ def initialize_build(app_name):
 def build():
     payload = request.get_json()
     app_name = payload.get("app_name")
-    utils.build.delay(app_name)
+    port = payload.get("port")
+    utils.build.delay(app_name, port)
     return jsonify({"app_name": app_name, "status": "OK"}), 200
 
 
