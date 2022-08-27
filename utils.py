@@ -34,5 +34,5 @@ def up(app_name):
     subprocess.run(["docker-compose", "-f", f"../shonku-projects/{app_name}/docker-compose.yml", "up", "-d"])
 
 @celery.task
-def up(app_name):
+def down(app_name):
     subprocess.run(["docker-compose", "-f", f"../shonku-projects/{app_name}/docker-compose.yml", "down"])
