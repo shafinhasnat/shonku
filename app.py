@@ -2,7 +2,7 @@ from crypt import methods
 from ctypes import util
 from flask import Flask, jsonify, request
 import utils
-import subprocess
+import random
 
 app = Flask(__name__)
 
@@ -30,18 +30,16 @@ def upload_app():
 
 @app.route("/initialize-build/<app_name>", methods=["GET"])
 def initialize_build(app_name):
-    utils.initialize_build.delay(f"../shonku-projects/{app_name}/Shonkufile", f"../shonku-projects/{app_name}")
+    port = random.randint(4000, 6000)
+    utils.initialize_build.delay(f"../shonku-projects/{app_name}/Shonkufile", f"../shonku-projects/{app_name}", port)
     return jsonify({"app_name": app_name, "status": "OK"}), 200
 
 @app.route("/build", methods=["POST"])
 def build():
     payload = request.get_json()
     app_name = payload.get("app_name")
-    port = payload.get("port")
-    utils.build.delay(app_name, port)
+    utils.build.delay(app_name)
     return jsonify({"app_name": app_name, "status": "OK"}), 200
-
-
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=6010, debug=True)
