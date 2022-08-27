@@ -31,7 +31,7 @@ def upload_app():
 @app.route("/initialize-build/<app_name>", methods=["GET"])
 def initialize_build(app_name):
     port = random.randint(4000, 6000)
-    utils.initialize_build.delay(f"../shonku-projects/{app_name}/Shonkufile", f"../shonku-projects/{app_name}", port)
+    utils.initialize_build.delay(app_name, f"../shonku-projects/{app_name}", port)
     return jsonify({"app_name": app_name, "status": "OK"}), 200
 
 @app.route("/build", methods=["POST"])

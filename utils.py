@@ -20,9 +20,9 @@ def upload_project(app_name, file):
         zip_ref.extractall(f"../shonku-projects/{app_name}/")
 
 @celery.task
-def initialize_build(file, save_location, port):
-    bp = Buildpack(file)
-    bp.generateDockerfile(file=file, save_location=save_location, port=port)
+def initialize_build(app_name, port):
+    bp = Buildpack(app_name)
+    bp.generateDockerfile(file=f"../shonku-projects/{app_name}/Shonkufile", save_location=f"../shonku-projects/{app_name}", port=port)
 
 @celery.task
 def build(app_name):
