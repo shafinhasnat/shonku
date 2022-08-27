@@ -41,5 +41,15 @@ def build():
     utils.build.delay(app_name)
     return jsonify({"app_name": app_name, "status": "OK"}), 200
 
+@app.route("/up/<app_name>", methods=["GET"])
+def up(app_name):
+    utils.up.delay(app_name)
+    return jsonify({"app_name": app_name, "status": "UP"}), 200
+
+@app.route("/down/<app_name>", methods=["GET"])
+def down(app_name):
+    utils.down.delay(app_name)
+    return jsonify({"app_name": app_name, "status": "DOWN"}), 200
+
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=6010, debug=True)

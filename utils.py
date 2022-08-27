@@ -28,3 +28,11 @@ def initialize_build(app_name, port):
 def build(app_name):
     process = subprocess.Popen([f'app_name={app_name} ../shonku-projects/build.sh'], stdout=subprocess.PIPE, shell=True)
     process.wait()
+
+@celery.task
+def up(app_name):
+    subprocess.run(["docker-compose", "-f", f"../shonku-projects/{app_name}/docker-compose.yml", "up", "-d"])
+
+@celery.task
+def up(app_name):
+    subprocess.run(["docker-compose", "-f", f"../shonku-projects/{app_name}/docker-compose.yml", "down"])
