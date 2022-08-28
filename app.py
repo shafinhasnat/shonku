@@ -30,8 +30,7 @@ def upload_app():
 
 @app.route("/initialize-build/<app_name>", methods=["GET"])
 def initialize_build(app_name):
-    port = random.randint(4000, 6000)
-    utils.initialize_build.delay(app_name, port)
+    utils.initialize_build.delay(app_name)
     return jsonify({"app_name": app_name, "status": "OK"}), 200
 
 @app.route("/build", methods=["POST"])
@@ -43,7 +42,8 @@ def build():
 
 @app.route("/up/<app_name>", methods=["GET"])
 def up(app_name):
-    utils.up.delay(app_name)
+    port = random.randint(4000, 6000)
+    utils.up.delay(app_name, port)
     return jsonify({"app_name": app_name, "status": "UP"}), 200
 
 @app.route("/down/<app_name>", methods=["GET"])
@@ -52,4 +52,4 @@ def down(app_name):
     return jsonify({"app_name": app_name, "status": "DOWN"}), 200
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=6010, debug=True)
+    app.run(host="0.0.0.0", port=8000, debug=True)

@@ -20,9 +20,9 @@ def upload_project(app_name, file):
         zip_ref.extractall(f"../shonku-projects/{app_name}/")
 
 @celery.task
-def initialize_build(app_name, port):
+def initialize_build(app_name):
     bp = Buildpack(app_name)
-    bp.generateDockerfile(file=f"../shonku-projects/{app_name}/Shonkufile", save_location=f"../shonku-projects/{app_name}", port=port)
+    bp.generateDockerfile(file=f"../shonku-projects/{app_name}/Shonkufile", save_location=f"../shonku-projects/{app_name}")
 
 @celery.task
 def build(app_name):
@@ -30,9 +30,10 @@ def build(app_name):
     process.wait()
 
 @celery.task
-def up(app_name):
-    subprocess.run(["docker-compose", "-f", f"../shonku-projects/{app_name}/docker-compose.yml", "up", "-d"])
+def up(app_name, port):
+    subprocess.run(["cat", f"../shonku-projects/{app_name}/docker-compose.yml", "|", "sed", f"s/[PORT]/{port}/g", "|", "docker-compose", "-f", "-", "up", "-d"])
 
 @celery.task
 def down(app_name):
     subprocess.run(["docker-compose", "-f", f"../shonku-projects/{app_name}/docker-compose.yml", "down"])
+# cat docker-compose.yml | sed "s/PORT/4040/g" | docker-compose -f - up -d
