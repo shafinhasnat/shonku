@@ -3,7 +3,7 @@ from ctypes import util
 from flask import Flask, jsonify, request
 import utils
 import random
-
+import socket
 app = Flask(__name__)
 
 
@@ -21,9 +21,8 @@ def create_app():
 @app.route("/upload-app", methods=["POST"])
 def upload_app():
     file = request.files["file"]
-    app_name = request.form["app_name"]
+    app_name = request.form["app_name"].lower()
     language = request.form["language"]
-    print("=====>", file.name, app_name, language)
     file.save(f"../shonku-projects/{app_name}/{file.filename}")
     utils.upload_project.delay(app_name, file.filename)
     return jsonify({"file name": file.name, "app_name": app_name, "language": language, "status": "OK"}), 200
@@ -44,7 +43,10 @@ def build():
 def up(app_name):
     port = random.randint(4000, 6000)
     utils.up.delay(app_name, port)
-    return jsonify({"app_name": app_name, "status": "UP"}), 200
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    s.connect(('8.8.8.8', 1))  # connect() for UDP doesn't send packets
+    local_ip_address = s.getsockname()[0]
+    return jsonify({"app_name": app_name, "url": f"http://{local_ip_address}:{port}", "message":"Try the url after few seconds later", "status": "UP"}), 200
 
 @app.route("/down/<app_name>", methods=["GET"])
 def down(app_name):
