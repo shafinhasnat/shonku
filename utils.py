@@ -30,7 +30,7 @@ def initialize_build(app_name):
 def build(app_name):
     # process = subprocess.Popen([f'app_name={app_name} ../shonku-projects/build.sh'], stdout=subprocess.PIPE, shell=True)
     # process.wait()
-    api.build(path=f"../shonku_projects/{app_name}/Dockerfile")
+    api.build(path=f"../shonku_projects/{app_name}/")
 
 @celery.task
 def up(app_name, port):
