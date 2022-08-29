@@ -3,7 +3,7 @@ from ctypes import util
 from flask import Flask, jsonify, request
 import utils
 import random
-import socket
+import requests
 app = Flask(__name__)
 
 
@@ -43,10 +43,8 @@ def build():
 def up(app_name):
     port = random.randint(4000, 6000)
     utils.up.delay(app_name, port)
-    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    s.connect(('8.8.8.8', 1))  # connect() for UDP doesn't send packets
-    local_ip_address = s.getsockname()[0]
-    return jsonify({"app_name": app_name, "url": f"http://{local_ip_address}:{port}", "message":"Try the url after few seconds later", "status": "UP"}), 200
+    public_ip = requests.get('https://api.ipify.org').content.decode('utf8')
+    return jsonify({"app_name": app_name, "url": f"http://{public_ip}:{port}", "message":"Try the url after few seconds later", "status": "UP"}), 200
 
 @app.route("/down/<app_name>", methods=["GET"])
 def down(app_name):
