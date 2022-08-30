@@ -4,6 +4,7 @@ import zipfile
 from buildpack import Buildpack
 from docker import APIClient, from_env, DockerClient
 from pymongo import MongoClient
+import requests
 
 m = MongoClient("mongodb://poridhimongo:poridhi@36.255.70.114:27017/?authSource=admin", connect=False)
 mongo = m["paas"]
@@ -36,6 +37,9 @@ def initialize_build(app_name):
     bp = Buildpack(app_name)
     bp.generateDockerfile(file=f"../shonku-projects/{app_name}/Shonkufile", save_location=f"../shonku-projects/{app_name}")
     mongo.projects.update_one({"app_name": app_name}, {"$set": {"dockerfile": True}})
+    for line in api.build(path=f"../shonku-projects/{app_name}", dockerfile="Dockerfile", tag=app_name):
+        print(line)
+    mongo.projects.update_one({"app_name": app_name}, {"$set": {"build": True}})
 
 @celery.task
 def build(app_name):
@@ -50,14 +54,15 @@ def up(app_name, port):
         api.remove_container(app_name)
         container = api.create_container(app_name, ports=[port], name=app_name, host_config=api.create_host_config(port_bindings={8000:port}))
         api.start(container)
-        mongo.projects.update_one({"app_name": app_name}, {"$set": {"up": True}})
+        public_ip = requests.get('https://api.ipify.org').content.decode('utf8')
+        mongo.projects.update_one({"app_name": app_name}, {"$set": {"up": True, "url": f"http://{public_ip}:{port}"}})
     except:
         container = api.create_container(app_name, ports=[port], name=app_name, host_config=api.create_host_config(port_bindings={8000:port}))
         api.start(container)
-        mongo.projects.update_one({"app_name": app_name}, {"$set": {"up": True}})
+        mongo.projects.update_one({"app_name": app_name}, {"$set": {"up": True, "url": f"http://{public_ip}:{port}"}})
 
 @celery.task
 def down(app_name):
     api.stop(app_name)
     api.remove_container(app_name)
-    mongo.projects.update_one({"app_name": app_name}, {"$set": {"up": False, "build": False}})
+    mongo.projects.update_one({"app_name": app_name}, {"$set": {"up": False, "build": False, "url": False}})
