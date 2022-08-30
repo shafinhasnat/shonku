@@ -49,16 +49,17 @@ def build(app_name):
 
 @celery.task
 def up(app_name, port):
-    public_ip = requests.get('https://api.ipify.org').content.decode('utf8')
     try:
         api.stop(app_name)
         api.remove_container(app_name)
         container = api.create_container(app_name, ports=[port], name=app_name, host_config=api.create_host_config(port_bindings={8000:port}))
         api.start(container)
+        public_ip = requests.get('https://api.ipify.org').content.decode('utf8')
         mongo.projects.update_one({"app_name": app_name}, {"$set": {"up": True, "url": f"http://{public_ip}:{port}"}})
     except:
         container = api.create_container(app_name, ports=[port], name=app_name, host_config=api.create_host_config(port_bindings={8000:port}))
         api.start(container)
+        public_ip = requests.get('https://api.ipify.org').content.decode('utf8')
         mongo.projects.update_one({"app_name": app_name}, {"$set": {"up": True, "url": f"http://{public_ip}:{port}"}})
 
 @celery.task
