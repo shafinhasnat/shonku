@@ -5,7 +5,7 @@ from buildpack import Buildpack
 from docker import APIClient, from_env, DockerClient
 from pymongo import MongoClient
 
-m = MongoClient("mongodb://poridhimongo:poridhi@36.255.70.114:27017/?authSource=admin")
+m = MongoClient("mongodb://poridhimongo:poridhi@36.255.70.114:27017/?authSource=admin", connect=False)
 mongo = m["paas"]
 
 celery = Celery(
