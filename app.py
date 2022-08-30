@@ -4,19 +4,38 @@ from flask import Flask, jsonify, request
 import utils
 import random
 import requests
+import json
 app = Flask(__name__)
-
-
 @app.route("/")
 def home():
     return "Hello world"
+
+@app.route("/projects", methods=["GET"])
+def projects():
+    resp = []
+    projects = utils.mongo.projects.find({})
+    for i in projects:
+        i["_id"]=str(i["_id"])
+        resp.append(i)
+    return jsonify({"projects": resp, "status": "OK"}), 200
+
+@app.route("/projects/<app_name>", methods=["GET"])
+def project(app_name):
+    find = utils.mongo.projects.find_one({"app_name": app_name})
+    if find:
+        find["_id"] = str(find["_id"])
+    return jsonify({"project": find, "status": "OK"}), 200
+
 
 @app.route("/create-app", methods=["POST"])
 def create_app():
     payload = request.get_json()
     app_name = payload.get("app_name")
-    utils.create_project.delay(app_name)
-    return jsonify({"app_name": app_name, "status": "OK"}), 200
+    find = utils.mongo.projects.find_one({"app_name": app_name})
+    if not find:
+        utils.create_project.delay(app_name)
+        return jsonify({"app_name": app_name, "status": "OK"}), 200
+    return jsonify({"app_name": app_name, "status": "ERROR", "msg": "Project already exist"}), 400
 
 @app.route("/upload-app", methods=["POST"])
 def upload_app():
