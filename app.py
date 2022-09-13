@@ -42,7 +42,7 @@ def upload_app():
     file = request.files["file"]
     app_name = request.form["app_name"].lower()
     language = request.form["language"]
-    file.save(f"../shonku-projects/{app_name}/{file.filename}")
+    file.save(f"/home/ubuntu/shonku-projects/{app_name}/{file.filename}")
     utils.upload_project.delay(app_name, file.filename)
     return jsonify({"file name": file.name, "app_name": app_name, "language": language, "status": "OK"}), 200
 
