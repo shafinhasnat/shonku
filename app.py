@@ -70,5 +70,12 @@ def down(app_name):
     utils.down.delay(app_name)
     return jsonify({"app_name": app_name, "status": "DOWN"}), 200
 
+@app.route("/launch-mongo", methods=["POST"])
+def launch_mongo():
+    payload = request.get_json()
+    app_name = payload.get("app_name")
+    utils.launch_mongo(app_name)
+    return jsonify({"app_name": app_name, "status": "SUCCESS", "message": "Mongo launch successful"}), 200
+
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8000, debug=True)

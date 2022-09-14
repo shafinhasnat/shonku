@@ -1,0 +1,17 @@
+version: '3.7'
+services:
+  shonku:
+    image: shafinhasnat/shonku:0.0.2
+    privileged: true
+    volumes:
+    - /home/ubuntu/shonku-projects:/home/ubuntu/shonku-projects
+    ports:
+    - 8000:8000
+  queue:
+    image: shafinhasnat/shonku:0.0.2
+    privileged: true
+    volumes:
+    - /home/ubuntu/shonku-projects:/home/ubuntu/shonku-projects
+    command: ["celery", "-A", "utils.celery", "worker", "--loglevel=info"]
+  redis:
+    image: redis:7.0.4-alpine
